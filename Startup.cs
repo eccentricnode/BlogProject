@@ -1,5 +1,7 @@
 using BlogProject.Data;
 using BlogProject.Models;
+using BlogProject.Services;
+using BlogProject.ViewModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -38,8 +40,22 @@ namespace BlogProject
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddIdentity<BlogUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddDefaultUI()
+                .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
+            
+            services.AddRazorPages();
+
+            // register custom DataService class
+            services.AddScoped<DataService>();
+
+            // register a preconfigured instance of MailSettings class
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
+            services.AddScoped<IBlogEmailSender, EmailService>();
+
+            // register image service
+            services.AddScoped<IImageService, BasicImageService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
